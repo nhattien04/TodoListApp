@@ -1,23 +1,33 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_list_app/pages/auth_page.dart';
+import 'dart:ui';
 import 'package:todo_list_app/pages/home_page.dart';
 
-void main() {
-  runApp(TodoListApp());
+void main() async {
+  await WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(new MyApp());
 }
 
-class TodoListApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Todo List App',
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, usersnapshot) {
+          if (usersnapshot.hasData) {
+            return HomePage();
+          } else {
+            return AuthPage();
+          }
+        },
+      ),
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        body: SafeArea(
-          child: HomePage(),
-        ),
-      ),
+          colorScheme: ColorScheme.light(), primaryColor: Colors.blue),
     );
   }
 }
